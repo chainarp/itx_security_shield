@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Top Menu -->
+    <menuitem
+        id="menu_itx_security_shield_root"
+        name="License Management"
+        sequence="90"/>
+
+    <!-- License Submenu -->
+    <menuitem
+        id="menu_license_main"
+        name="License"
+        parent="menu_itx_security_shield_root"
+        sequence="10"/>
+
+    <!-- Configuration Submenu -->
+    <menuitem
+        id="menu_license_configuration"
+        name="Configuration"
+        parent="menu_itx_security_shield_root"
+        sequence="20"/>
+
+    <!-- Monitoring Submenu -->
+    <menuitem
+        id="menu_license_monitoring"
+        name="Monitoring"
+        parent="menu_itx_security_shield_root"
+        sequence="30"/>
+
+    <!-- ================================================================ -->
+    <!-- License Menu Items -->
+    <!-- ================================================================ -->
+
+    <menuitem
+        id="menu_license_config"
+        name="License Configuration"
+        parent="menu_license_main"
+        action="action_license_config"
+        sequence="10"/>
+
+    <menuitem
+        id="menu_license_checks"
+        name="Validation Checks"
+        parent="menu_license_main"
+        action="action_license_check"
+        sequence="20"/>
+
+    <!-- ================================================================ -->
+    <!-- Monitoring Menu Items -->
+    <!-- ================================================================ -->
+
+    <menuitem
+        id="menu_license_logs"
+        name="Event Logs"
+        parent="menu_license_monitoring"
+        action="action_license_log"
+        sequence="10"/>
+
+    <menuitem
+        id="menu_license_violations"
+        name="Violations"
+        parent="menu_license_monitoring"
+        action="action_license_violations"
+        sequence="20"/>
+
+    <!-- ================================================================ -->
+    <!-- Configuration Menu Items (Settings) -->
+    <!-- ================================================================ -->
+
+    <menuitem
+        id="menu_license_settings"
+        name="Settings"
+        parent="menu_license_configuration"
+        action="action_license_config"
+        sequence="10"
+        groups="base.group_system"/>
+</odoo>

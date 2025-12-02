@@ -1,0 +1,7 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_license_check_user,license.check.user,model_license_check,base.group_user,1,0,0,0
+access_license_check_manager,license.check.manager,model_license_check,base.group_system,1,1,1,1
+access_license_log_user,license.log.user,model_license_log,base.group_user,1,0,0,0
+access_license_log_manager,license.log.manager,model_license_log,base.group_system,1,1,1,1
+access_license_config_user,license.config.user,model_license_config,base.group_user,1,0,0,0
+access_license_config_manager,license.config.manager,model_license_config,base.group_system,1,1,1,0

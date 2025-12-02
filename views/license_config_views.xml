@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- License Config - Form View -->
+    <record id="view_license_config_form" model="ir.ui.view">
+        <field name="name">license.config.form</field>
+        <field name="model">license.config</field>
+        <field name="arch" type="xml">
+            <form string="License Configuration">
+                <header>
+                    <button name="action_run_validation" type="object" string="Run Validation" class="oe_highlight"/>
+                    <button name="action_reload_license" type="object" string="Reload License"/>
+                    <button name="action_view_recent_checks" type="object" string="View Recent Checks"/>
+                    <button name="action_view_violation_logs" type="object" string="View Violations"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_recent_checks" type="object" class="oe_stat_button" icon="fa-check-square">
+                            <div class="o_field_widget o_stat_info">
+                                <span class="o_stat_value"><field name="total_checks"/></span>
+                                <span class="o_stat_text">Total Checks</span>
+                            </div>
+                        </button>
+                        <button name="action_view_violation_logs" type="object" class="oe_stat_button" icon="fa-exclamation-triangle">
+                            <div class="o_field_widget o_stat_info">
+                                <span class="o_stat_value"><field name="total_violations"/></span>
+                                <span class="o_stat_text">Violations</span>
+                            </div>
+                        </button>
+                    </div>
+
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+
+                    <group>
+                        <group string="Last Validation">
+                            <field name="last_check_date"/>
+                            <field name="last_check_status" decoration-success="last_check_status == 'valid'" decoration-danger="last_check_status == 'invalid'"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="License File" name="license_file">
+                            <group>
+                                <group string="File Information">
+                                    <field name="license_file_path"/>
+                                    <field name="license_file_exists" widget="boolean_toggle"/>
+                                    <field name="license_installed" widget="boolean_toggle"/>
+                                    <field name="license_installed_date" invisible="not license_installed"/>
+                                </group>
+                                <group string="License Details">
+                                    <field name="license_fingerprint"/>
+                                    <field name="license_expiry"/>
+                                </group>
+                            </group>
+                            <group string="Licensed Addons" invisible="not licensed_addons">
+                                <field name="licensed_addons" nolabel="1" colspan="2" widget="text"/>
+                            </group>
+                        </page>
+
+                        <page string="Grace Period" name="grace_period">
+                            <group>
+                                <group string="Grace Period Settings">
+                                    <field name="grace_period_enabled" widget="boolean_toggle"/>
+                                    <field name="grace_period_days"/>
+                                </group>
+                                <group string="Current Status">
+                                    <field name="grace_period_active" widget="boolean_toggle"/>
+                                    <field name="grace_period_started" invisible="not grace_period_active"/>
+                                    <field name="grace_period_ends" invisible="not grace_period_active"/>
+                                </group>
+                            </group>
+                            <group string="Grace Period Reason" invisible="not grace_period_reason">
+                                <field name="grace_period_reason" nolabel="1" colspan="2" widget="text"/>
+                            </group>
+                        </page>
+
+                        <page string="Validation Settings" name="validation_settings">
+                            <group string="Startup Validation">
+                                <group>
+                                    <field name="startup_check_enabled" widget="boolean_toggle"/>
+                                    <field name="startup_check_blocking" widget="boolean_toggle" invisible="not startup_check_enabled"/>
+                                </group>
+                            </group>
+
+                            <group string="Periodic Validation">
+                                <group>
+                                    <field name="periodic_check_enabled" widget="boolean_toggle"/>
+                                    <field name="periodic_check_interval" invisible="not periodic_check_enabled"/>
+                                </group>
+                            </group>
+
+                            <group string="File Integrity Checks">
+                                <group>
+                                    <field name="file_integrity_enabled" widget="boolean_toggle"/>
+                                    <field name="file_integrity_sample_pct" invisible="not file_integrity_enabled"/>
+                                </group>
+                            </group>
+                        </page>
+
+                        <page string="Emergency Unlock" name="emergency_unlock" groups="base.group_system">
+                            <div class="alert alert-danger" role="alert" invisible="not emergency_unlock_enabled">
+                                <strong>⚠️  WARNING: Emergency Unlock is ACTIVE!</strong>
+                                <p>All license checks are currently bypassed. This should only be used in emergency situations.</p>
+                                <p>Expires: <field name="emergency_unlock_expires" readonly="1"/></p>
+                            </div>
+
+                            <group>
+                                <group string="Emergency Unlock Status">
+                                    <field name="emergency_unlock_enabled" widget="boolean_toggle"/>
+                                    <field name="emergency_unlock_code" password="True" invisible="not emergency_unlock_enabled"/>
+                                    <field name="emergency_unlock_expires" invisible="not emergency_unlock_enabled"/>
+                                </group>
+                            </group>
+
+                            <div class="alert alert-warning" role="alert">
+                                <strong>⚠️  DANGER ZONE</strong>
+                                <p>Emergency unlock bypasses ALL license validation checks.</p>
+                                <p>This feature should ONLY be used in emergency situations when:</p>
+                                <ul>
+                                    <li>Hardware has been replaced and license needs renewal</li>
+                                    <li>License file is corrupted and system must continue operating</li>
+                                    <li>Critical production issue requires immediate access</li>
+                                </ul>
+                                <p>All emergency unlock activations are logged.</p>
+                            </div>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- License Config - Action -->
+    <record id="action_license_config" model="ir.actions.act_window">
+        <field name="name">License Configuration</field>
+        <field name="res_model">license.config</field>
+        <field name="view_mode">form</field>
+        <field name="target">current</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                License Configuration
+            </p>
+            <p>
+                Configure license validation settings, grace periods, and monitoring options.
+            </p>
+        </field>
+    </record>
+</odoo>

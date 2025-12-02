@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- License Log - List View -->
+    <record id="view_license_log_list" model="ir.ui.view">
+        <field name="name">license.log.list</field>
+        <field name="model">license.log</field>
+        <field name="arch" type="xml">
+            <list string="License Logs" create="false" edit="false">
+                <field name="create_date"/>
+                <field name="event_type"/>
+                <field name="severity" decoration-info="severity == 'info'" decoration-warning="severity == 'warning'" decoration-danger="severity in ('error', 'critical')"/>
+                <field name="message"/>
+                <field name="user_id"/>
+                <field name="grace_period_active" widget="boolean_toggle"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- License Log - Form View -->
+    <record id="view_license_log_form" model="ir.ui.view">
+        <field name="name">license.log.form</field>
+        <field name="model">license.log</field>
+        <field name="arch" type="xml">
+            <form string="License Log Entry" create="false" edit="false">
+                <header>
+                    <button name="action_view_related_check" type="object" string="View Related Check" invisible="not license_check_id"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="event_type"/></h1>
+                    </div>
+
+                    <group>
+                        <group string="Event Information">
+                            <field name="create_date"/>
+                            <field name="severity"/>
+                            <field name="check_type"/>
+                            <field name="user_id"/>
+                        </group>
+                        <group string="Context">
+                            <field name="license_check_id"/>
+                            <field name="grace_period_active"/>
+                            <field name="is_docker"/>
+                            <field name="is_vm"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="Message" name="message">
+                            <group>
+                                <field name="message" nolabel="1" colspan="2" widget="text"/>
+                            </group>
+                        </page>
+
+                        <page string="Technical Details" name="details" invisible="not details">
+                            <group>
+                                <field name="details" nolabel="1" colspan="2" widget="text"/>
+                            </group>
+                        </page>
+
+                        <page string="Hardware" name="hardware" invisible="not hardware_fingerprint">
+                            <group>
+                                <field name="hardware_fingerprint"/>
+                                <field name="machine_id"/>
+                            </group>
+                        </page>
+
+                        <page string="Affected Files" name="files" invisible="not files_affected">
+                            <group>
+                                <field name="files_affected" nolabel="1" colspan="2" widget="text"/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- License Log - Search View -->
+    <record id="view_license_log_search" model="ir.ui.view">
+        <field name="name">license.log.search</field>
+        <field name="model">license.log</field>
+        <field name="arch" type="xml">
+            <search string="License Logs">
+                <field name="event_type"/>
+                <field name="message"/>
+            </search>
+        </field>
+    </record>
+
+    <!-- License Log - Action -->
+    <record id="action_license_log" model="ir.actions.act_window">
+        <field name="name">License Logs</field>
+        <field name="res_model">license.log</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No license events logged yet
+            </p>
+            <p>
+                All license-related events, validations, and violations will be logged here.
+                This provides a complete audit trail of license activity.
+            </p>
+        </field>
+    </record>
+
+    <!-- License Violations - Action (filtered view) -->
+    <record id="action_license_violations" model="ir.actions.act_window">
+        <field name="name">License Violations</field>
+        <field name="res_model">license.log</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('severity', 'in', ['error', 'critical'])]</field>
+        <field name="context">{'search_default_violations': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No license violations detected
+            </p>
+            <p>
+                This view shows critical license events such as:
+                - Hardware mismatches
+                - License expiration
+                - File tampering
+                - Validation failures
+            </p>
+        </field>
+    </record>
+</odoo>

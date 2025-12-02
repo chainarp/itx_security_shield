@@ -1,0 +1,39 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg-info/
+.Python
+.venv/
+venv/
+*.log
+
+# Odoo
+*.pyc
+*.pyo
+*.swp
+*.swo
+
+# License files (should NOT be in git - confidential!)
+production.lic
+*.lic
+
+# IDE
+.vscode/
+.idea/
+*.sublime-*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.bak
+*~
+
+# Debug files
+debug_*.py
+test_*.py
+compare_*.py
