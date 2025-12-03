@@ -19,6 +19,10 @@ venv/
 production.lic
 *.lic
 
+# RSA Private Keys (should NOT be in git - confidential!)
+native/keys/private_*.pem
+**/private_*.pem
+
 # IDE
 .vscode/
 .idea/

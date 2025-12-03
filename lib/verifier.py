@@ -411,3 +411,44 @@ class ITXSecurityVerifier:
 
     def __repr__(self):
         return f"ITXSecurityVerifier(library_path='{self._library_path}', debug={self.debug})"
+
+
+# ============================================================================
+# Convenience Functions (for easy imports)
+# ============================================================================
+
+def get_hardware_info(debug: bool = False) -> Dict[str, Any]:
+    """
+    Convenience function to get hardware info without creating verifier instance.
+
+    Args:
+        debug: Enable debug logging
+
+    Returns:
+        Dictionary with hardware information
+
+    Example:
+        >>> from odoo.addons.itx_security_shield.lib.verifier import get_hardware_info
+        >>> hw_info = get_hardware_info()
+        >>> print(hw_info['fingerprint'])
+    """
+    verifier = ITXSecurityVerifier(debug=debug)
+    return verifier.get_hardware_info()
+
+
+def get_fingerprint(debug: bool = False) -> str:
+    """
+    Convenience function to get hardware fingerprint.
+
+    Args:
+        debug: Enable debug logging
+
+    Returns:
+        Hardware fingerprint (64-char hex string)
+
+    Example:
+        >>> from odoo.addons.itx_security_shield.lib.verifier import get_fingerprint
+        >>> fingerprint = get_fingerprint()
+    """
+    verifier = ITXSecurityVerifier(debug=debug)
+    return verifier.get_fingerprint()

@@ -18,11 +18,15 @@ Features:
 * Secure SHA-256 hardware fingerprints
 * License validation and management
 * Runtime integrity checking
+* License Generator with hybrid RSA+AES encryption
+* Automated hardware binding
+* License file storage and management
 
 Technical Details:
 ------------------
 * Native C library for performance and security
 * Python wrapper with comprehensive error handling
+* Hybrid encryption (RSA-4096 + AES-256-GCM)
 * Zero-overhead production builds
 * Debug mode for troubleshooting
 
@@ -32,6 +36,8 @@ Security:
 * Anti-debugging protection
 * Fingerprint-based validation
 * Tamper detection
+* RSA digital signatures for license authorization
+* AES-256-GCM authenticated encryption
 
     """,
     'author': 'ITX Corporation',
@@ -49,6 +55,7 @@ Security:
         'views/license_check_views.xml',
         'views/license_log_views.xml',
         'views/license_config_views.xml',
+        'views/license_generator_views.xml',
         'views/menu_views.xml',
     ],
     'demo': [],

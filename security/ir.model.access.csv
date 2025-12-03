@@ -5,3 +5,7 @@ access_license_log_user,license.log.user,model_license_log,base.group_user,1,0,0
 access_license_log_manager,license.log.manager,model_license_log,base.group_system,1,1,1,1
 access_license_config_user,license.config.user,model_license_config,base.group_user,1,0,0,0
 access_license_config_manager,license.config.manager,model_license_config,base.group_system,1,1,1,0
+access_license_generator_manager,license.generator.manager,model_itxss_license_generator,base.group_system,1,1,1,1
+access_license_generated_user,license.generated.user,model_itxss_license_generated,base.group_user,1,0,0,0
+access_license_generated_manager,license.generated.manager,model_itxss_license_generated,base.group_system,1,1,1,1
+access_license_details_wizard_manager,license.details.wizard.manager,model_itxss_license_details_wizard,base.group_system,1,1,1,1

@@ -1,0 +1,301 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- ================================================================ -->
+    <!-- License Generator Wizard Form -->
+    <!-- ================================================================ -->
+    <record id="view_license_generator_form" model="ir.ui.view">
+        <field name="name">itxss.license.generator.form</field>
+        <field name="model">itxss.license.generator</field>
+        <field name="arch" type="xml">
+            <form string="Generate License">
+                <header>
+                    <button name="action_generate_license"
+                            string="Generate License"
+                            type="object"
+                            class="oe_highlight"
+                            invisible="license_generated"/>
+                    <button name="action_download_license"
+                            string="Download License"
+                            type="object"
+                            class="oe_highlight"
+                            invisible="not license_generated"/>
+                    <button name="action_reset"
+                            string="Generate Another"
+                            type="object"
+                            invisible="not license_generated"/>
+                </header>
+
+                <sheet>
+                    <!-- Not Generated Yet -->
+                    <div invisible="license_generated">
+                        <group>
+                            <group string="Customer Information">
+                                <field name="customer_name" placeholder="e.g., ABC Company Ltd."/>
+                                <field name="po_number" placeholder="e.g., PO-2024-001"/>
+                                <field name="contract_number" placeholder="e.g., CTR-2024-001"/>
+                                <field name="contact_email" placeholder="customer@example.com"/>
+                                <field name="contact_phone" placeholder="+66-xxx-xxx-xxx"/>
+                            </group>
+
+                            <group string="License Rights">
+                                <field name="licensed_addons" placeholder="itx_helloworld, itx_sales"/>
+                                <field name="max_instances"/>
+                                <field name="concurrent_users"/>
+                            </group>
+                        </group>
+
+                        <group>
+                            <group string="Validity Period">
+                                <field name="issue_date"/>
+                                <field name="expiry_date"/>
+                                <field name="grace_period_days"/>
+                                <field name="maintenance_until"/>
+                            </group>
+
+                            <group string="Hardware Binding">
+                                <field name="bind_hardware"/>
+                                <div colspan="2" class="alert alert-info" role="alert" invisible="not bind_hardware">
+                                    <i class="fa fa-info-circle"/> License will be bound to current machine hardware.
+                                    The customer will only be able to use this license on this specific machine.
+                                </div>
+                                <div colspan="2" class="alert alert-warning" role="alert" invisible="bind_hardware">
+                                    <i class="fa fa-warning"/> Hardware binding is disabled!
+                                    This license can be used on any machine (not recommended for production).
+                                </div>
+                            </group>
+                        </group>
+
+                        <group string="RSA Private Key (Authorization)" colspan="2">
+                            <group colspan="2">
+                                <field name="private_key_file" filename="private_key_filename" widget="binary"/>
+                                <field name="private_key_passphrase" password="True"/>
+                            </group>
+
+                            <div colspan="2" class="alert alert-success" role="alert" invisible="not private_key_filename">
+                                <i class="fa fa-check-circle"/> ✅ File uploaded: <strong><field name="private_key_filename" readonly="1" nolabel="1"/></strong>
+                            </div>
+
+                            <div colspan="2" class="alert alert-warning" role="alert">
+                                <i class="fa fa-key"/> Upload your RSA private key (PEM format).
+                                Only ITX staff with the private key can generate licenses.
+                                This key represents your authorization to create licenses.
+                            </div>
+                        </group>
+                    </div>
+
+                    <!-- Generated Successfully -->
+                    <div invisible="not license_generated">
+                        <div class="alert alert-success" role="alert">
+                            <h4><i class="fa fa-check-circle"/> License Generated Successfully!</h4>
+                            <p>License file for <strong><field name="customer_name" readonly="1"/></strong> has been created.</p>
+                            <p>Filename: <strong><field name="license_filename" readonly="1"/></strong></p>
+                        </div>
+
+                        <group string="Generation Log">
+                            <field name="generation_log" nolabel="1" colspan="2" widget="text"/>
+                        </group>
+
+                        <div class="alert alert-info" role="alert">
+                            <i class="fa fa-info-circle"/>
+                            The license has been saved to the database.
+                            You can download it now or access it later from "Generated Licenses" menu.
+                        </div>
+                    </div>
+
+                    <field name="license_generated" invisible="1"/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- ================================================================ -->
+    <!-- License Generator Action -->
+    <!-- ================================================================ -->
+    <record id="action_license_generator" model="ir.actions.act_window">
+        <field name="name">Generate License</field>
+        <field name="res_model">itxss.license.generator</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="context">{}</field>
+    </record>
+
+    <!-- ================================================================ -->
+    <!-- Generated Licenses Tree View -->
+    <!-- ================================================================ -->
+    <record id="view_license_generated_tree" model="ir.ui.view">
+        <field name="name">itxss.license.generated.tree</field>
+        <field name="model">itxss.license.generated</field>
+        <field name="arch" type="xml">
+            <list string="Generated Licenses"
+                  decoration-danger="state == 'expired' or state == 'revoked'"
+                  decoration-muted="state == 'revoked'">
+                <field name="customer_name"/>
+                <field name="po_number"/>
+                <field name="licensed_addons"/>
+                <field name="max_instances"/>
+                <field name="issue_date"/>
+                <field name="expiry_date"/>
+                <field name="days_until_expiry"/>
+                <field name="state"
+                       decoration-success="state == 'active'"
+                       decoration-warning="state == 'expired'"
+                       decoration-danger="state == 'revoked'"/>
+                <field name="file_size"/>
+                <field name="create_date" string="Generated On"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- ================================================================ -->
+    <!-- Generated Licenses Form View -->
+    <!-- ================================================================ -->
+    <record id="view_license_generated_form" model="ir.ui.view">
+        <field name="name">itxss.license.generated.form</field>
+        <field name="model">itxss.license.generated</field>
+        <field name="arch" type="xml">
+            <form string="Generated License">
+                <header>
+                    <button name="action_download_license"
+                            string="Download License"
+                            type="object"
+                            class="oe_highlight"/>
+                    <button name="action_view_details"
+                            string="View Details"
+                            type="object"/>
+                    <button name="action_revoke"
+                            string="Revoke"
+                            type="object"
+                            invisible="state != 'active'"
+                            confirm="Are you sure you want to revoke this license?"/>
+                    <button name="action_activate"
+                            string="Reactivate"
+                            type="object"
+                            invisible="state == 'active'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="active,expired,revoked"/>
+                </header>
+
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_download_license"
+                                type="object"
+                                class="oe_stat_button"
+                                icon="fa-download">
+                            <div class="o_field_widget o_stat_info">
+                                <span class="o_stat_text">Download</span>
+                                <span class="o_stat_text">License File</span>
+                            </div>
+                        </button>
+                    </div>
+
+                    <div class="alert alert-warning" role="alert" invisible="not is_expired">
+                        <i class="fa fa-warning"/> This license has expired!
+                    </div>
+
+                    <group>
+                        <group string="Customer Information">
+                            <field name="customer_name"/>
+                            <field name="po_number"/>
+                            <field name="contract_number"/>
+                        </group>
+
+                        <group string="License Details">
+                            <field name="licensed_addons"/>
+                            <field name="max_instances"/>
+                            <field name="hardware_fingerprint" widget="char" readonly="1"/>
+                        </group>
+                    </group>
+
+                    <group>
+                        <group string="Validity">
+                            <field name="issue_date"/>
+                            <field name="expiry_date"/>
+                            <field name="days_until_expiry"/>
+                            <field name="is_expired"/>
+                        </group>
+
+                        <group string="File Information">
+                            <field name="license_filename"/>
+                            <field name="file_size" widget="integer"/>
+                            <field name="create_date" string="Generated On"/>
+                        </group>
+                    </group>
+
+                    <group string="Notes">
+                        <field name="notes" nolabel="1" placeholder="Additional notes..."/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- ================================================================ -->
+    <!-- Generated Licenses Search View -->
+    <!-- ================================================================ -->
+    <record id="view_license_generated_search" model="ir.ui.view">
+        <field name="name">itxss.license.generated.search</field>
+        <field name="model">itxss.license.generated</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="customer_name"/>
+                <field name="po_number"/>
+                <field name="contract_number"/>
+                <filter string="Active" name="filter_active" domain="[('state', '=', 'active')]"/>
+                <filter string="Expired" name="filter_expired" domain="[('state', '=', 'expired')]"/>
+                <filter string="Revoked" name="filter_revoked" domain="[('state', '=', 'revoked')]"/>
+            </search>
+        </field>
+    </record>
+
+    <!-- ================================================================ -->
+    <!-- Generated Licenses Action -->
+    <!-- ================================================================ -->
+    <record id="action_license_generated" model="ir.actions.act_window">
+        <field name="name">Generated Licenses</field>
+        <field name="res_model">itxss.license.generated</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{'search_default_filter_active': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No licenses generated yet
+            </p>
+            <p>
+                Click "Generate License" to create your first license file.
+            </p>
+        </field>
+    </record>
+
+    <!-- ================================================================ -->
+    <!-- License Details Wizard Form -->
+    <!-- ================================================================ -->
+    <record id="view_license_details_wizard_form" model="ir.ui.view">
+        <field name="name">itxss.license.details.wizard.form</field>
+        <field name="model">itxss.license.details.wizard</field>
+        <field name="arch" type="xml">
+            <form string="License Details">
+                <sheet>
+                    <group>
+                        <field name="details" nolabel="1" colspan="2" widget="text" readonly="1"/>
+                    </group>
+                </sheet>
+                <footer>
+                    <button string="Close" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!-- ================================================================ -->
+    <!-- Menu Items -->
+    <!-- ================================================================ -->
+    <menuitem id="menu_license_generator"
+              name="Generate License"
+              parent="menu_itx_security_shield_root"
+              action="action_license_generator"
+              sequence="20"/>
+
+    <menuitem id="menu_license_generated"
+              name="Generated Licenses"
+              parent="menu_itx_security_shield_root"
+              action="action_license_generated"
+              sequence="21"/>
+</odoo>
