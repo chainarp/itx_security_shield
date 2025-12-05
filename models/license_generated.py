@@ -220,6 +220,111 @@ class LicenseGenerated(models.Model):
             expired_licenses.write({'state': 'expired'})
             _logger.info(f"Updated {len(expired_licenses)} licenses to expired state")
 
+    # ========================================================================
+    # License File Management
+    # ========================================================================
+    def action_deploy_to_production(self):
+        """Deploy this license as production.lic file."""
+        self.ensure_one()
+
+        if self.state != 'active':
+            raise UserError('Only active licenses can be deployed to production!')
+
+        import os
+
+        # Get production.lic path
+        addon_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        production_lic_path = os.path.join(addon_path, 'production.lic')
+
+        try:
+            # Delete old production.lic if exists
+            if os.path.exists(production_lic_path):
+                os.remove(production_lic_path)
+                _logger.info(f"Deleted old production.lic: {production_lic_path}")
+
+            # Write new production.lic
+            license_data = base64.b64decode(self.license_file)
+            with open(production_lic_path, 'wb') as f:
+                f.write(license_data)
+
+            _logger.info(f"Deployed license to production.lic: {production_lic_path}")
+
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'title': 'Success',
+                    'message': f'License deployed to production.lic successfully!',
+                    'type': 'success',
+                    'sticky': False,
+                }
+            }
+
+        except Exception as e:
+            _logger.error(f"Failed to deploy license: {e}")
+            raise UserError(f'Failed to deploy license to production.lic: {str(e)}')
+
+    # ========================================================================
+    # CRUD Operations
+    # ========================================================================
+    @api.model
+    def create(self, vals_list):
+        """Create new license and archive old active licenses."""
+        # Handle both single dict and list of dicts (Odoo 19 compatibility)
+        if not isinstance(vals_list, list):
+            vals_list = [vals_list]
+
+        # Archive all existing active licenses before creating new one
+        # Check if any new record will be active
+        has_active = any(vals.get('state') == 'active' for vals in vals_list)
+        if has_active:
+            active_licenses = self.search([('state', '=', 'active')])
+            if active_licenses:
+                active_licenses.write({'state': 'revoked'})
+                _logger.info(f"Archived {len(active_licenses)} old active licenses")
+
+        records = super().create(vals_list)
+        for record in records:
+            _logger.info(f"Created new license for customer: {record.customer_name}")
+        return records
+
+    def unlink(self):
+        """Delete license record and remove production.lic file."""
+        import os
+
+        # Get production.lic path
+        addon_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        production_lic_path = os.path.join(addon_path, 'production.lic')
+
+        # Check if any deleted record is active
+        has_active = any(rec.state == 'active' for rec in self)
+
+        # Log deleted licenses
+        for record in self:
+            _logger.warning(f"Deleting license record: {record.customer_name} (State: {record.state})")
+
+        # Call super to delete records
+        result = super().unlink()
+
+        # If deleted license was active, delete production.lic file
+        if has_active and os.path.exists(production_lic_path):
+            try:
+                os.remove(production_lic_path)
+                _logger.warning(f"Deleted production.lic file: {production_lic_path}")
+            except Exception as e:
+                _logger.error(f"Failed to delete production.lic: {e}")
+
+        return result
+
+    # ========================================================================
+    # Constraints
+    # ========================================================================
+    _sql_constraints = [
+        ('unique_active_license',
+         "CHECK(state != 'active' OR id IN (SELECT id FROM itxss_license_generated WHERE state = 'active' ORDER BY create_date DESC LIMIT 1))",
+         'Only one active license is allowed at a time. Please revoke the existing active license first.')
+    ]
+
 
 class LicenseDetailsWizard(models.TransientModel):
     """Wizard to display license details."""

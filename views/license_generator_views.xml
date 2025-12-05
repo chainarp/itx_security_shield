@@ -159,6 +159,12 @@
                             string="Download License"
                             type="object"
                             class="oe_highlight"/>
+                    <button name="action_deploy_to_production"
+                            string="Deploy to Production"
+                            type="object"
+                            class="btn-primary"
+                            invisible="state != 'active'"
+                            confirm="This will replace the current production.lic file. Are you sure?"/>
                     <button name="action_view_details"
                             string="View Details"
                             type="object"/>
@@ -173,7 +179,6 @@
                             invisible="state == 'active'"/>
                     <field name="state" widget="statusbar" statusbar_visible="active,expired,revoked"/>
                 </header>
-
                 <sheet>
                     <div class="oe_button_box" name="button_box">
                         <button name="action_download_license"
